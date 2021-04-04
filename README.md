@@ -98,7 +98,7 @@ Data access looks like as to normal file.
   reader->Close( false ); // delete reader but don't close a base stream
   ...
 ```
-The system has a memory limit to for keeping decompressed blocks. 20MB is default volume.
+The system has a memory limit for keeping decompressed blocks. 20MB is default volume.
 For change limit see the following code. 
 ```cpp
   ZippedBlockStack::GetInstance()->SetMemoryLimit( 1024 * 1024 * 50 ); // 50MB. Default - 20MB.
