@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZippedStream", "ZippedStream\ZippedStream.vcxproj", "{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug dynlib|Win32 = Debug dynlib|Win32
+		Debug exe|Win32 = Debug exe|Win32
+		Debug statlib|Win32 = Debug statlib|Win32
+		Release dynlib|Win32 = Release dynlib|Win32
+		Release exe|Win32 = Release exe|Win32
+		Release statlib|Win32 = Release statlib|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Debug dynlib|Win32.ActiveCfg = Debug dynlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Debug dynlib|Win32.Build.0 = Debug dynlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Debug exe|Win32.ActiveCfg = Debug|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Debug exe|Win32.Build.0 = Debug|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Debug statlib|Win32.ActiveCfg = Debug statlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Debug statlib|Win32.Build.0 = Debug statlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Release dynlib|Win32.ActiveCfg = Release dynlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Release dynlib|Win32.Build.0 = Release dynlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Release exe|Win32.ActiveCfg = Release|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Release exe|Win32.Build.0 = Release|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Release statlib|Win32.ActiveCfg = Release statlib|Win32
+		{167B7F23-6467-4CCE-A9D1-5C1AF5E46AAE}.Release statlib|Win32.Build.0 = Release statlib|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {517C0293-64C4-40FF-99C4-9DAA48090AAE}
+	EndGlobalSection
+EndGlobal

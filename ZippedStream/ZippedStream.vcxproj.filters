@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ZippedStreamBlock.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ZippedStream.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ZippedBuffer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ZippedStreamExternals.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ZippedStreamException.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ZippedStreamBlock.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ZippedStream.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ZippedBuffer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ZippedAfx.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{8f8bba4e-b45d-49e1-a648-fa84db40e76b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{7b4aff28-abdd-489c-885e-c0bda93a13aa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
