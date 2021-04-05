@@ -76,5 +76,7 @@ void main() {
     cout << e.what() << endl;
   }
 
+  
+  ZippedBlockReaderCache::GetInstance()->SetMemoryLimit( 1024 * 1024 * 20 );
   system("pause");
 }
