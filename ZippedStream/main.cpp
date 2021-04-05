@@ -46,7 +46,7 @@ void TestDecompress() {
     return;
   }
 
-  ZippedStreamReader* reader = new ZippedStreamReader( fopen( "Sounds_Addon_zipped.vdf" /* "zipped.vdf"*/, "rb" ) );
+  ZippedStreamReader* reader = new ZippedStreamReader( fopen( "zipped.vdf", "rb" ) );
 
   const uint cacheSize = 8192;
   byte cache[cacheSize];
@@ -69,7 +69,7 @@ void TestDecompress() {
 
 void main() {
   try {
-    //TestCompress();
+    TestCompress();
     TestDecompress();
   }
   catch( const std::exception& e ) {

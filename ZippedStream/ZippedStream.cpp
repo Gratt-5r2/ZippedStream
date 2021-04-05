@@ -18,11 +18,15 @@ long ZippedStreamBase::Tell() {
 }
 
 long ZippedStreamBase::Seek( const long& offset, const uint& origin ) {
+  long newPosition = Position;
   switch( origin ) {
-    case SEEK_SET: Position = offset; break;
-    case SEEK_CUR: Position += offset; break;
-    case SEEK_END: Position = Header.Length - offset - 1; break;
+    case SEEK_SET: newPosition = offset; break;
+    case SEEK_CUR: newPosition += offset; break;
+    case SEEK_END: newPosition = Header.Length - offset - 1; break;
   }
+
+  if( newPosition >= 0 && newPosition < Header.Length )
+    Position = newPosition;
 
   return Position;
 }
