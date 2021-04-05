@@ -127,7 +127,6 @@ ulong ZippedStreamReader::Read( byte* buffer, const ulong& length ) {
   ulong readedTotal = 0;
   while( toRead > 0 ) {
     auto block = GetBlockToRead();
-    StackIn( block );
     ulong readed = block->Read( buffer, toRead );
     if( readed == 0 )
       break;
@@ -147,16 +146,6 @@ ulong ZippedStreamReader::Write( byte* buffer, const ulong& length ) {
 
 bool ZippedStreamReader::EndOfFile() {
   return Position >= (long&)Header.Length;
-}
-
-void ZippedStreamReader::StackIn( ZippedBlockBase* block ) {
-  if( !block->IsDecompressed() )
-    ZippedBlockStack::GetInstance()->StackIn( block );
-}
-
-void ZippedStreamReader::StackOut( ZippedBlockBase* block ) {
-  if( block->IsDecompressed() )
-    ZippedBlockStack::GetInstance()->StackOut( block );
 }
 
 

@@ -48,6 +48,10 @@ public:
 
 
 class ZSTREAMAPI ZippedBlockReader : public ZippedBlockBase {
+private:
+  friend class ZippedBlockReaderCache;
+  bool IsCached;
+
 public:
   ZippedBlockReader( FILE* baseStream, const ulong& position );
   virtual void CommitHeader();
@@ -82,22 +86,26 @@ public:
 
 
 
-const ulong STACK_SIZE_DEFAULT = 1024 * 1024 * 20; // 20MB
-const ulong STACK_COUNT_MAX    = 1024;
+const ulong CACHE_READER_SIZE_DEFAULT    = 1024 * 1024 * 20; // 20MB
+const ulong CACHE_READER_STACK_COUNT_MAX = 1024;
 
 
 
-class ZSTREAMAPI ZippedBlockStack {
+class ZSTREAMAPI ZippedBlockReaderCache {
   ulong CacheSizeMax;
   ulong CacheSize;
-  ulong CacheCount;
-  ZippedBlockBase* Stack[STACK_COUNT_MAX];
-  ZippedBlockStack();
+  Common::Array<ZippedBlockReader*> Stack;
+
+  void Push( ZippedBlockReader* block );
+  void Pop( ZippedBlockReader* block );
+  ZippedBlockReaderCache();
 
 public:
-  void StackIn( ZippedBlockBase* block );
-  void StackOut( ZippedBlockBase* block );
-  void StackOutLast();
+  uint GetBlocksCount();
+  void CacheIn( ZippedBlockReader* block );
+  void CacheOut( ZippedBlockReader* block );
+  void CacheOutLast();
   void SetMemoryLimit( const ulong& size );
-  static ZippedBlockStack* GetInstance();
+  ZippedBlockReader* GetTopBlock();
+  static ZippedBlockReaderCache* GetInstance();
 };

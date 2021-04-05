@@ -70,6 +70,7 @@ ZippedBlockBase::~ZippedBlockBase() {
 
 
 ZippedBlockReader::ZippedBlockReader( FILE* baseStream, const ulong& position ) : ZippedBlockBase( baseStream, position ) {
+  IsCached = false;
   CommitHeader();
 }
 
@@ -100,6 +101,8 @@ ulong ZippedBlockReader::GetFileSize() {
 }
 
 ulong ZippedBlockReader::Read( byte* buffer, const ulong& length ) {
+  CacheIn();
+
   ulong memLeft = Header.LengthSource - Position;
   ulong toRead = min( length, memLeft );
   if( toRead == 0 )
@@ -119,20 +122,19 @@ bool ZippedBlockReader::EndOfBlock() {
 }
 
 void ZippedBlockReader::CacheIn( const ulong& position ) {
-  throw std::exception( "Read-only objects not support caching." );
+  ZippedBlockReaderCache::GetInstance()->CacheIn( this );
 }
 
 void ZippedBlockReader::CacheOut() {
-  throw std::exception( "Read-only objects not support caching." );
+  ZippedBlockReaderCache::GetInstance()->CacheOut( this );
 }
 
 bool ZippedBlockReader::Cached() {
-  throw std::exception( "Read-only objects not support caching." );
+  return IsCached;
 }
 
 ZippedBlockReader::~ZippedBlockReader() {
-  if( IsDecompressed() )
-    ZippedBlockStack::GetInstance()->StackOut( this );
+  CacheOut();
 }
 
 
@@ -212,56 +214,71 @@ bool ZippedBlockWriter::Cached() {
 
 
 
-ZippedBlockStack::ZippedBlockStack() {
-  CacheSizeMax = STACK_SIZE_DEFAULT;
+ZippedBlockReaderCache::ZippedBlockReaderCache() {
+  CacheSizeMax = CACHE_READER_SIZE_DEFAULT;
   CacheSize = 0;
-  CacheCount = 0;
 }
 
-void ZippedBlockStack::StackIn( ZippedBlockBase* block ) {
-  if( CacheCount > 0 && Stack[CacheCount - 1] == block )
+uint ZippedBlockReaderCache::GetBlocksCount() {
+  return Stack.GetNum();
+}
+
+void ZippedBlockReaderCache::CacheIn( ZippedBlockReader* block ) {
+  if( GetTopBlock() == block )
     return;
 
-  if( CacheCount >= STACK_COUNT_MAX )
-    StackOutLast();
+  if( block->IsCached ) {
+    Stack.Remove( block );
+    Stack.Insert( block );
+    return;
+  }
 
-  Stack[CacheCount++] = block;
+  while( Stack.GetNum() >= CACHE_READER_STACK_COUNT_MAX )
+    CacheOutLast();
+
+  Push( block );
+  
+  while( CacheSize > CacheSizeMax && Stack.GetNum() > 1 )
+    CacheOutLast();
+}
+
+void ZippedBlockReaderCache::CacheOut( ZippedBlockReader* block ) {
+  if( block->IsCached )
+    Pop( block );
+}
+
+void ZippedBlockReaderCache::CacheOutLast() {
+  if( Stack.GetNum() )
+    Pop( Stack[0] );
+}
+
+void ZippedBlockReaderCache::SetMemoryLimit( const ulong& size ) {
+  CacheSizeMax = size;
+}
+
+ZippedBlockReader* ZippedBlockReaderCache::GetTopBlock() {
+  if( Stack.GetNum() == 0 )
+    return Null;
+
+  return Stack.GetLast();
+}
+
+void ZippedBlockReaderCache::Push( ZippedBlockReader* block ) {
   block->CommitData();
   block->Decompress();
   CacheSize += block->Header.LengthSource;
-  
-  while( CacheSize > CacheSizeMax && CacheCount > 1 )
-    StackOutLast();
+  Stack.Insert( block );
+  block->IsCached = true;
 }
 
-void ZippedBlockStack::StackOut( ZippedBlockBase* block ) {
-  for( int i = CacheCount - 1; i >= 0; i-- ) {
-    if( Stack[i] == block ) {
-      block->Buffer.Clear();
-      int countToRemove = CacheCount - i;
-      CacheSize -= block->Header.LengthSource;
-      CacheCount--;
-
-      if( countToRemove > 0 )
-        memcpy( &Stack[i], &Stack[i + 1], countToRemove * 4 );
-
-      break;
-    }
-  }
+void ZippedBlockReaderCache::Pop( ZippedBlockReader* block ) {
+  CacheSize -= block->Header.LengthSource;
+  Stack.Remove( block );
+  block->Buffer.Clear();
+  block->IsCached = false;
 }
 
-void ZippedBlockStack::StackOutLast() {
-  CacheSize -= Stack[0]->Header.LengthSource;
-  memcpy( &Stack[0], &Stack[1], CacheCount * 4 );
-  CacheCount--;
-}
-
-void ZippedBlockStack::SetMemoryLimit( const ulong& size ) {
-  CacheSizeMax = size;
-  
-}
-
-ZippedBlockStack* ZippedBlockStack::GetInstance() {
-  static ZippedBlockStack* stack = new ZippedBlockStack();
+ZippedBlockReaderCache* ZippedBlockReaderCache::GetInstance() {
+  static ZippedBlockReaderCache* stack = new ZippedBlockReaderCache();
   return stack;
 }

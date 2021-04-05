@@ -20,6 +20,7 @@ typedef unsigned long ulong;
 #define shi_malloc malloc
 #define shi_realloc realloc
 #define shi_free free
+#define Invalid (-1)
 #endif
 
 
@@ -31,9 +32,14 @@ typedef unsigned long ulong;
 #endif
 #else
 #ifndef _ZIPPEDSTREAM_INTERNAL
+#ifndef _EXE
 #pragma comment(lib, "ZippedStream.lib")
+#endif
 #endif
 #define ZSTREAMAPI
 #endif
 
+#ifndef __UNION_ARRAY_H__
+#include "Array\Array.h"
+#endif
 #include "ZippedStream.h"

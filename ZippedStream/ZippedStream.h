@@ -47,8 +47,6 @@ public:
   virtual ulong Read( byte* buffer, const ulong& length );
   virtual ulong Write( byte* buffer, const ulong& length );
   virtual bool EndOfFile();
-  virtual void StackIn( ZippedBlockBase* block );
-  virtual void StackOut( ZippedBlockBase* block );
 };
 
 
