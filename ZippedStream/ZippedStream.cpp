@@ -1,15 +1,27 @@
 #include "ZippedAfx.h"
+#include <iostream>
+using std::string;
+using std::cout;
+using std::endl;
+using std::cin;
+
+EXTERN_C {
+ZSTREAMAPI ulong ZIPPED_THREADS_COUNT         = 8;
+ZSTREAMAPI ulong BLOCK_SIZE_DEFAULT           = 1024 * 1024 / 4; // 0.25MB
+ZSTREAMAPI ulong CACHE_READER_SIZE_DEFAULT    = 1024 * 1024 * 8; // 8MB
+ZSTREAMAPI ulong CACHE_READER_STACK_COUNT_MAX = 1024;
+}
 
 
-
+#pragma region base
 ZippedStreamBase::ZippedStreamBase( FILE* baseStream, long position ) {
   ZIPASSERT( baseStream != Null, "Can not create a zipped stream. Base stream is Null." );
-  BaseStream = baseStream;
-  BasePosition = position;
-  Position = 0;
-  Blocks = Null;
-  Header.Length = 0;
-  Header.BlockSize = BLOCK_SIZE_DEFAULT;
+  BaseStream         = baseStream;
+  BasePosition       = position;
+  Position           = 0;
+  Blocks             = Null;
+  Header.Length      = 0;
+  Header.BlockSize   = BLOCK_SIZE_DEFAULT;
   Header.BlocksCount = 0;
 }
 
@@ -79,13 +91,18 @@ ulong ZippedStreamBase::GetStreamSize() {
 }
 
 ZippedStreamBase::~ZippedStreamBase() {
-  for( uint i = 0; i < Header.BlocksCount; i++ )
+  for( uint i = 0; i < Header.BlocksCount; i++ ) {
     delete Blocks[i];
+    Blocks[i] = Null;
+  }
+
   delete[] Blocks;
 }
+#pragma endregion
 
 
 
+#pragma region reader
 ZippedStreamReader::ZippedStreamReader( FILE* baseStream, long position ) : ZippedStreamBase( baseStream, position ) {
   CommitHeader();
   CommitData();
@@ -116,6 +133,12 @@ ZippedBlockBase* ZippedStreamReader::GetBlockToRead() {
   uint blockPosition = Position - blockID * Header.BlockSize;
   auto block = Blocks[blockID];
   block->Seek( blockPosition );
+
+  uint cachedCount = blockID + ZIPPED_THREADS_COUNT;
+  uint blockCount  = Header.BlocksCount;
+  for( uint i = blockID + 1; i <= cachedCount && i < blockCount; i++ )
+    Blocks[i]->CacheIn();
+
   return block;
 }
 
@@ -147,9 +170,11 @@ ulong ZippedStreamReader::Write( byte* buffer, const ulong& length ) {
 bool ZippedStreamReader::EndOfFile() {
   return Position >= (long&)Header.Length;
 }
+#pragma endregion
 
 
 
+#pragma region writer
 ZippedStreamWriter::ZippedStreamWriter( FILE* baseStream, long position ) : ZippedStreamBase( baseStream, position ) {
   LengthCompressed = 0;
 }
@@ -233,3 +258,4 @@ void ZippedStreamWriter::Flush() {
 ZippedStreamWriter::~ZippedStreamWriter() {
   Flush();
 }
+#pragma endregion

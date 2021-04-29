@@ -308,6 +308,11 @@ namespace Common {
   }
 
   template <class T>
+  void Array<T>::PrepareToReserveArray( const uint& count ) {
+    Allocator->PrepareToReserveArray( count );
+  }
+
+  template <class T>
   T& Array<T>::GetFirst() {
     return GetAllocator()[0];
   }

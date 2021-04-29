@@ -11,7 +11,7 @@
 #endif
 
 #ifdef _UNION_DEFINITIONS
-typedef unsigned int uint, uint_t;
+typedef unsigned int uint, uint_t, bool_t;
 typedef int int_t;
 typedef unsigned long ulong;
 #define Null nullptr
@@ -42,4 +42,5 @@ typedef unsigned long ulong;
 #ifndef __UNION_ARRAY_H__
 #include "Array\Array.h"
 #endif
+#include "Thread\Thread.h"
 #include "ZippedStream.h"

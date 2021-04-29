@@ -1,5 +1,12 @@
 #pragma once
 
+EXTERN_C {
+extern ZSTREAMAPI ulong ZIPPED_THREADS_COUNT;
+extern ZSTREAMAPI ulong BLOCK_SIZE_DEFAULT;
+extern ZSTREAMAPI ulong CACHE_READER_SIZE_DEFAULT;
+extern ZSTREAMAPI ulong CACHE_READER_STACK_COUNT_MAX;
+}
+
 #include "ZippedStreamException.h"
 #include "ZippedStreamBlock.h"
 
@@ -39,7 +46,9 @@ public:
 
 
 class ZSTREAMAPI ZippedStreamReader : public ZippedStreamBase {
+protected:
   ZippedBlockBase* GetBlockToRead();
+
 public:
   ZippedStreamReader( FILE* baseStream, long position = 0 );
   virtual void CommitHeader();

@@ -131,6 +131,7 @@ namespace Common {
     bool CompareLinear( const Array& other ) const;
     bool CompareInsorted( const Array& other ) const;
     Array& Normalize();
+    void PrepareToReserveArray( const uint& count );
 
 
     const T& operator[]( const uint& index ) const;

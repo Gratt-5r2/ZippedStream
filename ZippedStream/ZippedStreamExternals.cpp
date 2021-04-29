@@ -2,7 +2,6 @@
 
 EXTERN_C {
 int ZSTREAMAPI ZippedStreamOpenRead( FILE* file, long position ) {
-  MessageBox(0, 0, 0, 0);
   ZippedStreamBase* stream = new ZippedStreamReader( file, position );
   return (int)stream;
 }

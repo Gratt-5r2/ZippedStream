@@ -2,8 +2,6 @@
 
 #include "ZippedBuffer.h"
 
-const ulong BLOCK_SIZE_DEFAULT = 1024 * 1024 * 2;  // 2MB
-
 
 
 class ZSTREAMAPI ZippedBlockBase {
@@ -39,7 +37,7 @@ public:
   virtual ulong Read( byte* buffer, const ulong& length ) = 0;
   virtual ulong Write( byte* buffer, const ulong& length ) = 0;
   virtual bool EndOfBlock() = 0;
-  virtual void CacheIn( const ulong& position = -1 ) = 0;
+  virtual bool CacheIn( const ulong& position = -1 ) = 0;
   virtual void CacheOut() = 0;
   virtual bool Cached() = 0;
   virtual ~ZippedBlockBase();
@@ -54,6 +52,7 @@ private:
 
 public:
   ZippedBlockReader( FILE* baseStream, const ulong& position );
+  virtual bool Decompress( const bool& clearCompressed = true );
   virtual void CommitHeader();
   virtual void CommitData();
   virtual ulong GetFileSize();
@@ -61,7 +60,7 @@ public:
   virtual ulong Read( byte* buffer, const ulong& length );
   virtual ulong Write( byte* buffer, const ulong& length );
   virtual bool EndOfBlock();
-  virtual void CacheIn( const ulong& position = -1 );
+  virtual bool CacheIn( const ulong& position = -1 );
   virtual void CacheOut();
   virtual bool Cached();
   virtual ~ZippedBlockReader();
@@ -79,33 +78,37 @@ public:
   virtual ulong Read( byte* buffer, const ulong& length );
   virtual ulong Write( byte* buffer, const ulong& length );
   virtual bool EndOfBlock();
-  virtual void CacheIn( const ulong& position = -1 );
+  virtual bool CacheIn( const ulong& position = -1 );
   virtual void CacheOut();
   virtual bool Cached();
 };
 
 
 
-const ulong CACHE_READER_SIZE_DEFAULT    = 1024 * 1024 * 20; // 20MB
-const ulong CACHE_READER_STACK_COUNT_MAX = 1024;
-
-
+const uint StackSizeMax = 1024;
 
 class ZSTREAMAPI ZippedBlockReaderCache {
+  friend class ZippedBlockReader;
   ulong CacheSizeMax;
   ulong CacheSize;
-  Common::Array<ZippedBlockReader*> Stack;
+  ZippedBlockReader* Stack[StackSizeMax];
+  uint StackSize;
 
+  void Move( const uint& toID, const uint& fromID, const uint& count );
   void Push( ZippedBlockReader* block );
   void Pop( ZippedBlockReader* block );
   ZippedBlockReaderCache();
 
 public:
   uint GetBlocksCount();
-  void CacheIn( ZippedBlockReader* block );
+  bool CacheIn( ZippedBlockReader* block );
   void CacheOut( ZippedBlockReader* block );
+  void CacheInvalidate( ZippedBlockReader* block );
   void CacheOutLast();
+  void CacheReduce();
   void SetMemoryLimit( const ulong& size );
   ZippedBlockReader* GetTopBlock();
   static ZippedBlockReaderCache* GetInstance();
+
+  void ShowDebug();
 };

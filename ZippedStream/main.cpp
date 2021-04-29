@@ -5,11 +5,11 @@ using std::cout;
 using std::endl;
 using std::cin;
 
-
+const bool DebugWriteFiles = false;
 
 void TestCompress() {
   cout << "Compressed test . . ." << endl;
-  char* fileName = "Sounds_Addon.vdf";
+  char* fileName = "Textures.vdf";
   FILE* fileIn = fopen( fileName, "rb" );
   if( fileIn == Null ) {
     throw std::exception( "Can not open Input file." );
@@ -26,7 +26,8 @@ void TestCompress() {
     if( readed == 0 )
       break;
 
-    uint writed = writer->Write( cache, readed );
+    if( DebugWriteFiles )
+      writer->Write( cache, readed );
   }
   uint timeEnd = GetTickCount();
   cout << "Compressed in " << timeEnd - timeStart << "ms" << endl;
@@ -56,7 +57,8 @@ void TestDecompress() {
     if( readed == 0 )
       break;
 
-    fwrite( cache, 1, readed, fileOut );
+    if( DebugWriteFiles )
+      fwrite( cache, 1, readed, fileOut );
   }
   uint timeEnd = GetTickCount();
   cout << "Decompressed in " << timeEnd - timeStart << "ms" << endl;
@@ -67,16 +69,57 @@ void TestDecompress() {
 
 
 
+
+void TestCopy() {
+  cout << "Copy test . . ." << endl;
+  char* fileName1 = "Textures.vdf";
+  FILE* fileIn = fopen( fileName1, "rb" );
+  if( fileIn == Null ) {
+    throw std::exception( "Can not open Input file." );
+    return;
+  }
+
+  char* fileName2 = "copied.vdf";
+  FILE* fileOut = fopen( fileName2, "wb+" );
+  if( fileOut == Null ) {
+    throw std::exception( "Can not open Output file." );
+    return;
+  }
+
+  const uint cacheSize = 8192;
+  byte cache[cacheSize];
+  uint timeStart = GetTickCount();
+  while( true ) {
+    uint readed = fread( cache, 1, cacheSize, fileIn );
+    if( readed == 0 )
+      break;
+
+    if( DebugWriteFiles )
+      fwrite( cache, 1, readed, fileOut );
+  }
+  uint timeEnd = GetTickCount();
+  cout << "Copy in " << timeEnd - timeStart << "ms" << endl;
+
+  fclose( fileIn );
+  fclose( fileOut );
+}
+
+
 void main() {
   try {
-    TestCompress();
-    TestDecompress();
+    while( true ) {
+      for( uint i = 0; i < 5000; i++ ) {
+        cout << "Iteration: " << i << endl;
+        TestDecompress();
+      }
+      //ZippedBlockReaderCache::GetInstance()->ShowDebug();
+      //TestCopy();
+      system( "pause" );
+    }
   }
   catch( const std::exception& e ) {
     cout << e.what() << endl;
   }
 
-  
-  ZippedBlockReaderCache::GetInstance()->SetMemoryLimit( 1024 * 1024 * 20 );
   system("pause");
 }
