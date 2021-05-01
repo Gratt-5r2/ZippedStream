@@ -37,7 +37,7 @@ long ZippedStreamBase::Seek( const long& offset, const uint& origin ) {
     case SEEK_END: newPosition = Header.Length - offset - 1; break;
   }
 
-  if( newPosition >= 0 && newPosition < Header.Length )
+  if( newPosition >= 0 && newPosition < (long&)Header.Length )
     Position = newPosition;
 
   return Position;

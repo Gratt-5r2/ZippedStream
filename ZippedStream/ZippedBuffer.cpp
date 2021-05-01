@@ -71,8 +71,11 @@ void ZippedBuffer::Compress() {
 }
 
 void ZippedBuffer::Decompress( bool async ) {
-  if( !async || ZIPPED_THREADS_COUNT <= 1 )
-    return DecompressAsync();
+  if( !async || ZIPPED_THREADS_COUNT <= 1 ) {
+    DecompressAsync();
+    Compressed.Clear();
+    return;
+  }
 
   DecompressContextMutex.Enter();
   AsyncContext = &ZippedBuffer_AsyncHelper::GetInstance().Start( this, &ZippedBuffer::DecompressAsync );
@@ -87,11 +90,12 @@ void ZippedBuffer::DecompressAsync() {
   ZIPASSERT( result == Z_OK, "Decompress failed." );
   Source.Buffer = (byte*)shi_realloc( Source.Buffer, Source.Length );
 
-  // TODO
-  Compressed.Clear();
-
   DecompressContextMutex.Enter();
-  AsyncContext = Null;
+  if( AsyncContext ) {
+    if( AsyncContext->UseOneBuffer )
+      Compressed.Clear();
+    AsyncContext = Null;
+  }
   DecompressContextMutex.Leave();
 }
 
@@ -129,7 +133,7 @@ bool ZippedBuffer::DecompressIsActive() {
 }
 
 ZippedBuffer::~ZippedBuffer() {
-  // pass
+  WaitForDecompress();
 }
 
 
@@ -175,6 +179,7 @@ AsyncContext& ZippedBuffer_AsyncHelper::Start( ZippedBuffer* owner, void(__thisc
   ResetEvent( con.WaitForEnd );
   con.Buffer = owner;
   con.Function = func;
+  con.UseOneBuffer = True;
   SetEvent( con.WaitForStart );
   return con;
 }
@@ -185,6 +190,14 @@ void ZippedBuffer_AsyncHelper::AsyncProcedure( AsyncContext& context ) {
     ResetEvent( context.WaitForStart );
     (context.Buffer->*context.Function)();
     SetEvent( context.WaitForEnd );
+  }
+}
+
+ZippedBuffer_AsyncHelper::~ZippedBuffer_AsyncHelper() {
+  for( uint i = 0; i < Contexts.GetNum(); i++ ) {
+    Contexts[i].Thread.Break();
+    CloseHandle( Contexts[i].WaitForStart );
+    CloseHandle( Contexts[i].WaitForEnd );
   }
 }
 

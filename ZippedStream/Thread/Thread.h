@@ -81,11 +81,9 @@ namespace Common {
   }
 
   inline void Thread::Resume() {
-    ulong v = ResumeThread( Handle ) > 0;
-    if( v > 0 ) {
-      // cout << "Resume thread again . . . " << v << endl;
+    ulong result = ResumeThread( Handle ) > 0;
+    if( result > 0 )
       while( ResumeThread( Handle ) > 0 );
-    }
   }
 
   inline void Thread::SetPriority( int priority ) {

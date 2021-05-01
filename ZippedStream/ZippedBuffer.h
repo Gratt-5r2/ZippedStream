@@ -68,6 +68,7 @@ struct ZSTREAMAPI ZippedBuffer_AsyncHelper {
   ZippedBuffer_AsyncHelper( const uint& threads_count );
   AsyncContext& GetNextThread();
   AsyncContext& Start( ZippedBuffer* owner, void(__thiscall ZippedBuffer::* func)() );
+  ~ZippedBuffer_AsyncHelper();
   static void AsyncProcedure( AsyncContext& context );
   static ZippedBuffer_AsyncHelper& GetInstance( const uint& threads_count = 8 );
 };

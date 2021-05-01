@@ -260,9 +260,9 @@ bool ZippedBlockReaderCache::CacheIn( ZippedBlockReader* block ) {
 
   Push( block );
   
-  static const uint SizeForThread = 1024 * 1024 * 2;
+  static const uint SizePerThread = 1024 * 1024 * 2;
   uint cacheSizeLimit = ZIPPED_THREADS_COUNT > 1 ?
-    SizeForThread * ZIPPED_THREADS_COUNT:
+    SizePerThread * ZIPPED_THREADS_COUNT:
     CacheSizeMax;
 
   if( CacheSize > cacheSizeLimit || StackSize >= StackSizeMax - 1 ) {
@@ -357,6 +357,6 @@ ZippedBlockReaderCache* ZippedBlockReaderCache::GetInstance() {
 
 void ZippedBlockReaderCache::ShowDebug() {
   for( uint i = 0; i < StackSize; i++ )
-    printf(" %n", Stack[i] );
+    printf(" %p", Stack[i] );
 }
 #pragma endregion
